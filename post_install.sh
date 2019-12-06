@@ -1,33 +1,65 @@
 #!/bin/sh -x
 
+sa="/root/freenas"
+pdir="${0%/*}"
+
+
+if [ ! -d "/usr/local/www/storjadmin" ]; then
+  mkdir -p "/usr/local/www/storjadmin"
+fi; cp -R "${pdir}/overlay/storjadmin" /usr/local/www/storjadmin
+
+if [ "${1}" = "standard" ]; then    # Only cp files when installing a standard-jail
+
+  mv /usr/local/etc/nginx/nginx.conf /usr/local/etc/nginx/nginx.conf.old
+  cp "${sa}"/overlay/usr/local/etc/nginx/nginx.conf /usr/local/etc/nginx/nginx.conf
+
+  mv /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf.old
+  cp "${sa}"/overlay/usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf
+
+  cp "${sa}"/overlay/etc/motd /etc/motd
+
+  if [ ! -d "/root/bin" ]; then
+    mkdir -p "/root/bin"
+  fi; cp "${sa}"/overlay/root/bin/storj-pwreset /root/bin/storj-pwreset
+
+fi
+
+find /usr/local/www/storjadmin -type f -name ".htaccess" -depth -exec rm -f {} \;
+find /usr/local/www/storjadmin -type f -name ".empty" -depth -exec rm -f {} \;
+
+chown -R www:www /usr/local/www/storjadmin
+chmod +x /root/bin/storj-pwreset
+
 # Enable the service
-
-
-: ${quasselcore_data="/var/db/quasselcore"}
-: ${quasselcore_log="/var/log/quasselcore.log"}
-: ${quasselcore_listen="0.0.0.0,::"}
-
-# Enable the service
+sysrc -f /etc/rc.conf nginx_enable=YES
+sysrc -f /etc/rc.conf php_fpm_enable=YES
 sysrc -f /etc/rc.conf storj_enable="YES"
 
-echo "storj is now installed" > /root/PLUGIN_INFO
-date  >> /root/PLUGIN_INFO
-echo "----------------------" >> /root/PLUGIN_INFO
-#sysrc -f /etc/rc.conf quasselcore_enable="YES"
+service nginx start  2>/dev/null
+service php-fpm start  2>/dev/null
 
-# Start the service
-service storj start 2>/dev/null
+if [ "${1}" = "standard" ]; then
+  v2srv_ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 
-#sysrc -f /etc/rc.conf quasselcore_args="--configdir=${quasselcore_data} --logfile=${quasselcore_log} --listen=${quasselcore_listen} --ssl-cert=${quasselcore_data}/quasselCert.pem --require-ssl"
+  colors () {                               # Defien Some Colors for Messages
+    grn=$'\e[1;32m'
+    blu=$'\e[1;34m'
+    cyn=$'\e[1;36m'
+    end=$'\e[0m'
+  }; colors
 
-# Make the default DB dir
-#mkdir -p /var/db/quasselcore
-#chown quasselcore:quasselcore /var/db/quasselcore
+  end_report () {                 # read all about it!
+    echo; echo; echo; echo
+        echo " ${blu}Status Report: ${end}"; echo
+        echo "    $(service nginx status)"
+        echo "  $(service php-fpm status)"
+    echo
+        echo " ${cyn}StorjAdmin${end}: ${grn}http://${v2srv_ip}${end}"
+    echo
+    echo; exit
+  }; end_report
 
-# Gen the SSL key
-#printf "\n\n\n\n\n\n\n\n\n\n" | /usr/local/etc/rc.d/quasselcore onekeygen 2>/dev/null >/dev/null
-
-# Start the service
-if $(service quasselcore start 2>/dev/null >/dev/null) ; then
-    echo "Starting quasselcore."
 fi
+
+
+

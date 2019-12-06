@@ -1,16 +1,25 @@
 {
   "name": "storj",
   "plugin_schema": "2",
-  "release": "12.1-RELEASE",
+  "release": "11.2-RELEASE",
   "artifact": "https://github.com/swstechdev/freenas.git"
   "pkgs": [
+    "shells/bash",
+    "devel/git",
+    "www/nginx",
+    "lang/php72",
+    "ftp/php72-curl",
+    "security/php72-filter",
+    "devel/php72-json",
+    "www/php72-session",
+    "archivers/php72-zip"
   ],
-# "packagesite": "http://pkg.cdn.trueos.org/iocage/unstable",
+  "packagesite": "http://pkg.FreeBSD.org/${ABI}/quarterly",
   "fingerprints": {
-          "iocage-plugins": [
+          "plugin-default": [
                   {
                   "function": "sha256",
-                  "fingerprint": "226efd3a126fb86e71d60a37353d17f57af816d1c7ecad0623c21f0bf73eb0c7"
+                  "fingerprint": "b0170035af3acc5f3f3ae1859dc717101b4e6c1d0a794ad554928ca0cbb2f438"
           }
           ]
   },
