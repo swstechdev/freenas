@@ -2,7 +2,7 @@
   "name": "storj",
   "plugin_schema": "2",
   "release": "11.2-RELEASE",
-  "artifact": "https://github.com/swstechdev/freenas.git"
+  "artifact": "https://github.com/swstechdev/freenas.git",
   "pkgs": [
     "shells/bash",
     "devel/git",
