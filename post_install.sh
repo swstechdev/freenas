@@ -1,16 +1,16 @@
 #!/bin/sh -x
 
-sa="/root/freenas"
+sa="/root/storjadmin"
 pdir="${0%/*}"
 
 
 if [ ! -d "/usr/local/www/storjadmin" ]; then
   mkdir -p "/usr/local/www/storjadmin"
-fi; cp -R "${pdir}/overlay/storjadmin" /usr/local/www/storjadmin
+fi; cp -R "${pdir}/overlay/usr/local/www/storjadmin" /usr/local/www/
 
 if [ "${1}" = "standard" ]; then    # Only cp files when installing a standard-jail
 
-  mv /usr/local/etc/nginx/nginx.conf /usr/local/etc/nginx/nginx.conf.old
+  mv /usr/local/etc/nginx/nginx.conf /usr/local/etc/nginx/nginx.conf.old 
   cp "${sa}"/overlay/usr/local/etc/nginx/nginx.conf /usr/local/etc/nginx/nginx.conf
 
   mv /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf.old
